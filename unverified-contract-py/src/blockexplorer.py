@@ -3,7 +3,7 @@ import logging
 
 import requests
 from functools import lru_cache
-from src.storage import get_secrets
+from storage import get_secrets
 
 class BlockExplorer:
 

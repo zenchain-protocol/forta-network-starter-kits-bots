@@ -39,10 +39,10 @@ To run the project locally, follow these steps:
   nvm use
   ```
 
-- **Python 3.9**: Make sure you have Python 3.9 installed. You can create a virtual environment for Python 3.9.
+- **Python 3.10**: Make sure you have Python 3.10 installed. You can create a virtual environment for Python 3.10.
 
   ```sh
-  python3.9 -m venv venv
+  python3.10 -m venv venv
   source venv/bin/activate
   ```
 

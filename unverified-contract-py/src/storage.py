@@ -1,4 +1,4 @@
-import forta_agent
+import forta_bot_sdk
 import json
 import requests
 import os
@@ -13,7 +13,7 @@ test_mode = "main" if 'NODE_ENV' in os.environ and 'production' in os.environ.ge
 
 
 def _token():
-    tk = forta_agent.fetch_jwt({})
+    tk = forta_bot_sdk.fetch_jwt({})
     return {"Authorization": f"Bearer {tk}"}
 
 

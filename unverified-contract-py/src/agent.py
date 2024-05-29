@@ -6,23 +6,24 @@ from os import environ
 import concurrent.futures
 from functools import lru_cache
 
-import forta_agent
+import forta_bot_sdk
 import rlp
-from forta_agent import get_json_rpc_url
+from forta_bot_sdk import scan_ethereum, scan_alerts, run_health_check
 from hexbytes import HexBytes
 from pyevmasm import disassemble_hex
-from web3 import Web3
+from web3 import Web3, AsyncWeb3
 import time
+import asyncio
 
-from src.blockexplorer import BlockExplorer
-from src.constants import CONTRACT_SLOT_ANALYSIS_DEPTH, WAIT_TIME, CONCURRENT_SIZE
-from src.findings import UnverifiedCodeContractFindings
-from src.storage import get_secrets
+from blockexplorer import BlockExplorer
+from constants import CONTRACT_SLOT_ANALYSIS_DEPTH, WAIT_TIME, CONCURRENT_SIZE
+from findings import UnverifiedCodeContractFindings
+from storage import get_secrets
 
 SECRETS_JSON = get_secrets()
 
-web3 = Web3(Web3.HTTPProvider(get_json_rpc_url()))
-blockexplorer = BlockExplorer(web3.eth.chain_id)
+# TODO: move to config/constants
+blockexplorer = BlockExplorer(1)
 
 FINDINGS_CACHE = []
 THREAD_STARTED = False
@@ -38,8 +39,7 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 root.addHandler(handler)
 
-
-def initialize():
+async def initialize():
     """
     this function initializes the state variables that are tracked across tx and blocks
     it is called from test to reset state between tests
@@ -54,7 +54,8 @@ def initialize():
     CREATED_CONTRACTS = {}
 
     global CHAIN_ID
-    CHAIN_ID = web3.eth.chain_id
+    # TODO: Move to configs/constants
+    CHAIN_ID = 1
 
     environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
 
@@ -66,7 +67,7 @@ def calc_contract_address(w3, address, nonce) -> str:
     """
 
     address_bytes = bytes.fromhex(address[2:].lower())
-    return Web3.toChecksumAddress(Web3.keccak(rlp.encode([address_bytes, nonce]))[-20:])
+    return Web3.to_checksum_address(Web3.keccak(rlp.encode([address_bytes, nonce]))[-20:])
 
 
 @lru_cache(maxsize=12800)
@@ -78,7 +79,7 @@ def is_contract(w3, address) -> bool:
     if address is None:
         return True
     try:
-        code = w3.eth.get_code(Web3.toChecksumAddress(address))
+        code = w3.eth.get_code(Web3.to_checksum_address(address))
         return code != HexBytes("0x")
     except Exception as e:
         logging.warn(f"Web3 error for is_contract method", {address: address, e: e})
@@ -100,15 +101,15 @@ def get_storage_addresses(w3, address) -> set:
     def get_storage_at_slot(size):
         for i in size:
             try:
-                mem = w3.eth.get_storage_at(Web3.toChecksumAddress(address), i)
+                mem = w3.eth.get_storage_at(Web3.to_checksum_address(address), i)
                 if mem != HexBytes(
                     "0x0000000000000000000000000000000000000000000000000000000000000000"
                 ):
                     # looking at both areas of the storage slot as - depending on packing - the address could be at the beginning or the end.
                     if is_contract(w3, mem[0:20]):
-                        address_set.add(Web3.toChecksumAddress(mem[0:20].hex()))
+                        address_set.add(Web3.to_checksum_address(mem[0:20].hex()))
                     if is_contract(w3, mem[12:]):
-                        address_set.add(Web3.toChecksumAddress(mem[12:].hex()))
+                        address_set.add(Web3.to_checksum_address(mem[12:].hex()))
             except Exception as e:
                 logging.warning(
                     f"Web3 Error at get_storage_at method", {address: address, e: e}
@@ -140,7 +141,7 @@ def get_opcode_addresses(w3, address) -> set:
     if address is None:
         return set()
 
-    code = w3.eth.get_code(Web3.toChecksumAddress(address))
+    code = w3.eth.get_code(Web3.to_checksum_address(address))
     opcode = disassemble_hex(code.hex())
 
     address_set = set()
@@ -148,7 +149,7 @@ def get_opcode_addresses(w3, address) -> set:
         for param in op.split(" "):
             if param.startswith("0x") and len(param) == 42:
                 if is_contract(w3, param):
-                    address_set.add(Web3.toChecksumAddress(param))
+                    address_set.add(Web3.to_checksum_address(param))
 
     end_time = time.time()
 
@@ -158,7 +159,7 @@ def get_opcode_addresses(w3, address) -> set:
 
 
 def cache_contract_creation(
-    w3, transaction_event: forta_agent.transaction_event.TransactionEvent
+    w3, transaction_event: forta_bot_sdk.TransactionEvent
 ):
     global CREATED_CONTRACTS
 
@@ -191,7 +192,7 @@ def cache_contract_creation(
                         created_contract_address = calc_contract_address(w3, trace.action.from_, nonce)
                     else:
                         # For contracts creating other contracts, get the nonce using Web3
-                        nonce = w3.eth.getTransactionCount(Web3.toChecksumAddress(trace.action.from_), transaction_event.block_number)
+                        nonce = w3.eth.getTransactionCount(Web3.to_checksum_address(trace.action.from_), transaction_event.block_number)
                         created_contract_address = calc_contract_address(w3, trace.action.from_, nonce - 1)
 
                     if created_contract_address not in CREATED_CONTRACTS:
@@ -285,7 +286,7 @@ def detect_unverified_contract_creation(
                                     calc_created_contract_address = calc_contract_address(w3, trace.action.from_, nonce)
                                 else:
                                     # For contracts creating other contracts, get the nonce using Web3
-                                    nonce = w3.eth.getTransactionCount(Web3.toChecksumAddress(trace.action.from_), transaction_event.block_number)
+                                    nonce = w3.eth.getTransactionCount(Web3.to_checksum_address(trace.action.from_), transaction_event.block_number)
                                     calc_created_contract_address = calc_contract_address(w3, trace.action.from_, nonce - 1)
 
                                 if (
@@ -345,36 +346,41 @@ def detect_unverified_contract_creation(
         logging.warning(f"Exception: {e}")
 
 
-def provide_handle_transaction(w3, blockexplorer):
-    def handle_transaction(
-        transaction_event: forta_agent.transaction_event.TransactionEvent,
-    ) -> list:
-        global FINDINGS_CACHE
-        global THREAD_STARTED
+async def handle_transaction(
+    transaction_event: forta_bot_sdk.TransactionEvent, provider: AsyncWeb3
+) -> list:
+    global FINDINGS_CACHE
+    global THREAD_STARTED
+    if not THREAD_STARTED:
+        THREAD_STARTED = True
+        thread = threading.Thread(
+            target=detect_unverified_contract_creation, args=(provider, blockexplorer)
+        )
+        thread.start()
+    cache_contract_creation(provider, transaction_event)
 
-        if not THREAD_STARTED:
-            THREAD_STARTED = True
-            thread = threading.Thread(
-                target=detect_unverified_contract_creation, args=(w3, blockexplorer)
-            )
-            thread.start()
+    # uncomment for local testing; otherwise the process will exit
+    # while thread.is_alive():
+    #     pass
+    findings = FINDINGS_CACHE
+    FINDINGS_CACHE = []
+    return findings
 
-        cache_contract_creation(w3, transaction_event)
-        # uncomment for local testing; otherwise the process will exit
-        # while thread.is_alive():
-        #     pass
+async def main():
+    """This function is the entry point
+    """
+    initialize_response = await initialize()
 
-        findings = FINDINGS_CACHE
-        FINDINGS_CACHE = []
-        return findings
+    # TODO: Fix AssertionError: botId must be non-empty string
+    await asyncio.gather(
+        scan_ethereum({
+            'rpc_url': 'https://cloudflare-eth.com/',
+            'handle_transaction': handle_transaction
+        }),
+        run_health_check()
+    )
 
-    return handle_transaction
 
-
-real_handle_transaction = provide_handle_transaction(web3, blockexplorer)
-
-
-def handle_transaction(
-    transaction_event: forta_agent.transaction_event.TransactionEvent,
-):
-    return real_handle_transaction(transaction_event)
+# only invoke main() if running this file directly (vs importing it for testing)
+if __name__ == "__main__":
+    asyncio.run(main())

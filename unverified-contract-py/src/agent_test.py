@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 
-from forta_agent import (
+from forta_bot_sdk import (
     FindingSeverity,
     FindingType,
     create_transaction_event,
