@@ -3,6 +3,9 @@ import json
 import requests
 import os
 
+# TODO: Replace this inaccessible, private Forta API/database with some other method of managing secrets in production
+# https://docs.forta.network/en/latest/sensitive-data/
+# https://docs.forta.network/en/latest/jwt-auth/
 owner_db = "https://research.forta.network/database/owner/"
 
 test_mode = "main" if 'NODE_ENV' in os.environ and 'production' in os.environ.get(

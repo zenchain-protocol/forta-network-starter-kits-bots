@@ -5,3 +5,4 @@ __pycache__
 .pytest_cache
 api_keys.py
 secrets.json
+venv/
