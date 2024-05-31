@@ -1,22 +1,29 @@
 import time
+import pytest
 from datetime import datetime
 
 from forta_bot_sdk import (
     FindingSeverity,
     FindingType,
-    create_transaction_event,
+    TransactionEvent,
     EntityType,
 )
+import asyncio
 import agent
 from blockexplorer_mock import BlockExplorerMock
 from web3_mock import CONTRACT_NO_ADDRESS, CONTRACT_WITH_ADDRESS, EOA_ADDRESS, Web3Mock
 from unittest.mock import patch
+from constants import TEST_CHAIN_ID
 
 w3 = Web3Mock()
 blockexplorer = BlockExplorerMock(1)
 
 
 class TestUnverifiedContractAgent:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        asyncio.run(agent.initialize())
+
     def test_get_opcode_addresses_eoa(self):
         addresses = agent.get_opcode_addresses(w3, EOA_ADDRESS)
         assert len(addresses) == 0, "should be empty"
@@ -45,9 +52,7 @@ class TestUnverifiedContractAgent:
 
     @patch("src.findings.calculate_alert_rate", return_value=1.0)
     def test_detect_unverified_contract_with_unverified_contract_no_trace(self, mocker):
-        agent.initialize()
-
-        tx_event = create_transaction_event(
+        tx_event = TransactionEvent(
             {
                 "transaction": {
                     "hash": "0",
@@ -59,6 +64,7 @@ class TestUnverifiedContractAgent:
                     "timestamp": datetime.now().timestamp(),
                 },
                 "receipt": {"logs": []},
+                "chain_id": TEST_CHAIN_ID,
             }
         )
         agent.cache_contract_creation(w3, tx_event)
@@ -99,9 +105,7 @@ class TestUnverifiedContractAgent:
         ), "should have label_type address"
 
     def test_detect_unverified_contract_with_unverified_contract_trace(self):
-        agent.initialize()
-
-        tx_event = create_transaction_event(
+        tx_event = TransactionEvent(
             {
                 "transaction": {
                     "hash": "0",
@@ -149,9 +153,7 @@ class TestUnverifiedContractAgent:
         assert len(finding.metadata) > 0
 
     def test_detect_unverified_contract_with_verified_contract(self):
-        agent.initialize()
-
-        tx_event = create_transaction_event(
+        tx_event = TransactionEvent(
             {
                 "transaction": {
                     "hash": "0",
@@ -184,9 +186,7 @@ class TestUnverifiedContractAgent:
         assert len(agent.FINDINGS_CACHE) == 0, "should have 0 finding"
 
     def test_detect_unverified_contract_call_only(self):
-        agent.initialize()
-
-        tx_event = create_transaction_event(
+        tx_event = TransactionEvent(
             {
                 "transaction": {
                     "hash": "0",
