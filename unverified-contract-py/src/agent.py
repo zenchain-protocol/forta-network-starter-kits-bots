@@ -14,6 +14,7 @@ from pyevmasm import disassemble_hex
 from web3 import Web3, AsyncWeb3
 import time
 import asyncio
+import traceback
 
 from blockexplorer import BlockExplorer
 from constants import CONTRACT_SLOT_ANALYSIS_DEPTH, WAIT_TIME, CONCURRENT_SIZE
@@ -342,8 +343,8 @@ def detect_unverified_contract_creation(
             if not infinite:
                 break
 
-    except Exception as e:
-        logging.warning(f"Exception: {e}")
+    except Exception:
+        logging.warning(traceback.format_exc())
 
 
 async def handle_transaction(

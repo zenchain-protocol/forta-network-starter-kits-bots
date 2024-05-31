@@ -29,6 +29,9 @@ class UnverifiedCodeContractFindings:
                 'UNVERIFIED-CODE-CONTRACT-CREATION',
                 ScanCountType.CONTRACT_CREATION_COUNT)
 
+        # Ensure all metadata values are strings
+        metadata = {key: str(value) for key, value in metadata.items()}
+        
         unique_key = hashlib.sha256(f'{from_address},{contract_address}'.encode()).hexdigest()
 
         return Finding({
