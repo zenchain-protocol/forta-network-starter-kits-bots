@@ -20,11 +20,11 @@ from blockexplorer import BlockExplorer
 from constants import CONTRACT_SLOT_ANALYSIS_DEPTH, WAIT_TIME, CONCURRENT_SIZE
 from findings import UnverifiedCodeContractFindings
 from storage import get_secrets
+from constants import CHAIN_ID, EVM_RPC
 
 SECRETS_JSON = get_secrets()
 
-# TODO: move to config/constants
-blockexplorer = BlockExplorer(1)
+blockexplorer = BlockExplorer(CHAIN_ID)
 
 FINDINGS_CACHE = []
 THREAD_STARTED = False
@@ -53,10 +53,6 @@ async def initialize():
 
     global CREATED_CONTRACTS
     CREATED_CONTRACTS = {}
-
-    global CHAIN_ID
-    # TODO: Move to configs/constants
-    CHAIN_ID = 1
 
     environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
 
@@ -375,7 +371,7 @@ async def main():
     # TODO: Fix AssertionError: botId must be non-empty string
     await asyncio.gather(
         scan_ethereum({
-            'rpc_url': 'https://cloudflare-eth.com/',
+            'rpc_url': EVM_RPC,
             'handle_transaction': handle_transaction
         }),
         run_health_check()

@@ -1,0 +1,78 @@
+services:
+  alice:
+    image: krisbit/zenchain-testnet
+    ports:
+      - "9944:9944"
+      - "9615:9615"
+    command:
+      - "./usr/bin/zenchain-node"
+      - "--node-key=0000000000000000000000000000000000000000000000000000000000000001"
+      - "--base-path=/tmp/alice"
+      - "--chain=local"
+      - "--port=30333"
+      - "--validator"
+      - "--alice"
+      - "--bootnodes=/dns/bob/tcp/30333/p2p/12D3KooWHdiAxVd8uMQR1hGWXccidmfCwLqcMpGwR6QcTP6QRMuD"
+      - "--unsafe-rpc-external"
+      - "--log=sub-libp2p=trace"
+      - "--rpc-cors=all"
+    networks:
+      - internal_network
+
+  bob:
+    image: krisbit/zenchain-testnet
+    ports:
+      - "9945:9944"
+    command:
+      - "./usr/bin/zenchain-node"
+      - "--node-key=0000000000000000000000000000000000000000000000000000000000000002"
+      - "--base-path=/tmp/bob"
+      - "--chain=local"
+      - "--port=30333"
+      - "--validator"
+      - "--bob"
+      - "--bootnodes=/dns/alice/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp"
+      - "--rpc-cors=all"
+      - "--unsafe-rpc-external"
+      - "--log=sub-libp2p=trace"
+    networks:
+      - internal_network
+
+  dave:
+    image: krisbit/zenchain-testnet
+    ports:
+      - "9946:9944"
+    command:
+      - "./usr/bin/zenchain-node"
+      - "--node-key=0000000000000000000000000000000000000000000000000000000000000003"
+      - "--base-path=/tmp/light"
+      - "--chain=local"
+      - "--port=30333"
+      - "--bootnodes=/dns/alice/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp"
+      - "--bootnodes=/dns/bob/tcp/30333/p2p/12D3KooWHdiAxVd8uMQR1hGWXccidmfCwLqcMpGwR6QcTP6QRMuD"
+      - "--rpc-cors=all"
+      - "--unsafe-rpc-external"
+      - "--log=sub-libp2p=trace"
+    networks:
+      - internal_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - FORTA_BOT_ID=0x4c7e56a9a753e29ca92bd57dd593bdab0c03e762bdd04e2bc578cb82b842c1f3
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - alice
+      - bob
+      - dave
+    networks:
+      - internal_network
+
+networks:
+  internal_network:

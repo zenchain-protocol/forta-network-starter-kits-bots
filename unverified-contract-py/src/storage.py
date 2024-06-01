@@ -18,17 +18,17 @@ def _token():
 
 
 def _load_json(key: str) -> object:
-    if test_mode == "test":
+    # if test_mode == "test":
         # loading json from local file secrets.json
         with open("secrets.json") as f:
             return json.load(f)
-    else:
-        res = requests.get(f"{owner_db}{key}", headers=_token())
-        if res.status_code == 200:
-            return res.json()
-        else:
-            raise Exception(
-                f"error loading json from owner db: {res.status_code}, {res.text}")
+    # else:
+    #     res = requests.get(f"{owner_db}{key}", headers=_token())
+    #     if res.status_code == 200:
+    #         return res.json()
+    #     else:
+    #         raise Exception(
+    #             f"error loading json from owner db: {res.status_code}, {res.text}")
 
 
 def get_secrets():

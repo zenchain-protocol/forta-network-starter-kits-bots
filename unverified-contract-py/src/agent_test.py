@@ -13,7 +13,7 @@ import agent
 from blockexplorer_mock import BlockExplorerMock
 from web3_mock import CONTRACT_NO_ADDRESS, CONTRACT_WITH_ADDRESS, EOA_ADDRESS, Web3Mock
 from unittest.mock import patch
-from constants import TEST_CHAIN_ID
+from constants import CHAIN_ID
 
 w3 = Web3Mock()
 blockexplorer = BlockExplorerMock(1)
@@ -64,7 +64,7 @@ class TestUnverifiedContractAgent:
                     "timestamp": datetime.now().timestamp(),
                 },
                 "receipt": {"logs": []},
-                "chain_id": TEST_CHAIN_ID,
+                "chain_id": CHAIN_ID,
             }
         )
         agent.cache_contract_creation(w3, tx_event)

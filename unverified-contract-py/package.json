@@ -28,7 +28,7 @@
     }
   },
   "scripts": {
-    "postinstall": "python -m pip install -r requirements_dev.txt",
+    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then python -m pip install -r requirements_dev.txt; fi",
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e py --exec \"python3 ./src/agent.py\"",
     "start:prod": "npx forta-bot run --prod",
