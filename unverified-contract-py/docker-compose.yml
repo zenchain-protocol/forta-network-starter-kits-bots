@@ -58,16 +58,6 @@ services:
     networks:
       - internal_network
 
-  mitmproxy:
-    image: mitmproxy/mitmproxy
-    command: mitmdump --mode reverse:http://alice:9944 --listen-port 8080 -s ./mitmproxy_script.py
-    volumes:
-      - ./mitmproxy_script.py:/mitmproxy_script.py
-    ports:
-      - "8080:8080"
-    networks:
-      - internal_network
-
   app:
     build:
       context: .

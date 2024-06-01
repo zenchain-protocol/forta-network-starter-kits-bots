@@ -372,7 +372,10 @@ async def main():
     await asyncio.gather(
         scan_ethereum({
             'rpc_url': EVM_RPC,
-            'handle_transaction': handle_transaction
+            'handle_transaction': handle_transaction,
+            'rpc_headers': {
+                "Content-Type": "application/json"
+            }
         }),
         run_health_check()
     )
