@@ -4,6 +4,7 @@ import logging
 import requests
 from functools import lru_cache
 from storage import get_secrets
+from constants import ARBITRARY_BLOCKSCOUT_ENDPOINT, CHAIN_ID
 
 class BlockExplorer:
 
@@ -36,6 +37,9 @@ class BlockExplorer:
         elif chain_id == 43114:
             self.host = "https://api.snowtrace.io"
             self.api_key = BlockExplorer.SECRETS_JSON['apiKeys']['SNOWTRACE_TOKEN']
+        elif chain_id == CHAIN_ID:
+            self.host = ARBITRARY_BLOCKSCOUT_ENDPOINT
+            self.api_key = BlockExplorer.SECRETS_JSON['apiKeys']['BLOCKSCOUT_TOKEN']
 
     @lru_cache(maxsize=100)
     def is_verified(self, address):
