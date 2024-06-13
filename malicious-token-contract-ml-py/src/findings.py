@@ -1,4 +1,4 @@
-from forta_agent import Finding, FindingType, FindingSeverity
+from forta_bot_sdk import Finding, FindingType, FindingSeverity
 from bot_alert_rate import calculate_alert_rate, ScanCountType
 
 BOT_ID = "0x887678a85e645ad060b2f096812f7c71e3d20ed6ecf5f3acde6e71baa4cf86ad"
@@ -50,6 +50,11 @@ class TokenContractFindings:
                 "severity": FindingSeverity.High,
                 "metadata": self.metadata,
                 "labels": self.labels,
+                "source": {
+                    "chains": [
+                        {"chain_id": 1}
+                    ]  # associates this finding to Ethereum mainnet
+                },
             }
         )
 
@@ -78,6 +83,11 @@ class TokenContractFindings:
                 "severity": FindingSeverity.Info,
                 "metadata": self.metadata,
                 "labels": self.labels,
+                "source": {
+                    "chains": [
+                        {"chain_id": 1}
+                    ]  # associates this finding to Ethereum mainnet
+                },
             }
         )
 
@@ -100,5 +110,10 @@ class TokenContractFindings:
                 "severity": FindingSeverity.Info,
                 "metadata": self.metadata,
                 "labels": self.labels,
+                "source": {
+                    "chains": [
+                        {"chain_id": 1}
+                    ]  # associates this finding to Ethereum mainnet
+                },
             }
         )

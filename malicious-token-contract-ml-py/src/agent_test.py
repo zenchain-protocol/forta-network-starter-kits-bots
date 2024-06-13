@@ -1,4 +1,4 @@
-from forta_agent import FindingSeverity, create_transaction_event
+from forta_bot_sdk import FindingSeverity, create_transaction_event
 
 import agent
 from evmdasm import EvmBytecode
