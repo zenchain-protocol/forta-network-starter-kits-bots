@@ -1,6 +1,7 @@
 # Build stage: compile Python dependencies
 FROM ubuntu:focal as builder
 RUN apt-get update -y && apt-get upgrade -y
+# Python 3.10
 RUN apt-get install -y python3 pip
 RUN python3 -m pip install --upgrade pip
 COPY requirements.txt ./
@@ -11,7 +12,7 @@ FROM ubuntu:focal
 # this python version should match the build stage python version
 RUN apt-get update
 RUN apt-get -y install curl gnupg
-RUN curl -sL https://deb.nodesource.com/setup_14.x  | bash -
+RUN curl -sL https://deb.nodesource.com/setup_20.x  | bash -
 RUN apt-get -y install nodejs
 COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local:$PATH
