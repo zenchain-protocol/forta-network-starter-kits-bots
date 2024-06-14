@@ -66,7 +66,7 @@ class TokenContractFindings:
         self.label = labels
 
         if chain_id not in [43114, 10, 250]:
-            self.metadata["anomaly_score"] = (
+            self.metadata["anomaly_score"] = str(
                 calculate_alert_rate(
                     chain_id,
                     BOT_ID,
@@ -93,7 +93,7 @@ class TokenContractFindings:
 
     def non_malicious_contract_creation(self, chain_id: int) -> Finding:
         if chain_id not in [43114, 10, 250]:
-            self.metadata["anomaly_score"] = (
+            self.metadata["anomaly_score"] = str(
                 calculate_alert_rate(
                     chain_id,
                     BOT_ID,

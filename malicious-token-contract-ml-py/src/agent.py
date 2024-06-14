@@ -77,7 +77,7 @@ async def detect_malicious_token_contract_tx(
                         )
                     else:
                         # For contracts creating other contracts, get the nonce using Web3
-                        nonce = w3.eth.getTransactionCount(
+                        nonce = w3.eth.get_transaction_count(
                             w3.to_checksum_address(trace.action.from_),
                             transaction_event.block_number,
                         )
