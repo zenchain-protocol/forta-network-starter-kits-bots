@@ -14,7 +14,7 @@ class TokenContractFindings:
         model_threshold: float,
     ):
         self.metadata = {
-            "address_contained_in_created_contract_" + str(i): address
+            "address_contained_in_created_contract_" + str(i): str(address)
             for i, address in enumerate(contained_addresses, 1)
         }
         self.metadata["model_score"] = str(model_score)
@@ -33,13 +33,13 @@ class TokenContractFindings:
             scan_count_type = ScanCountType.CUSTOM_SCAN_COUNT
             custom_scan_count = 500_000
 
-        self.metadata["anomaly_score"] = calculate_alert_rate(
+        self.metadata["anomaly_score"] = str(calculate_alert_rate(
             chain_id,
             BOT_ID,
             "SUSPICIOUS-TOKEN-CONTRACT-CREATION",
             scan_count_type,
             custom_scan_count,
-        )
+        ))
         self.label = labels
         return Finding(
             {

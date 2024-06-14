@@ -33,9 +33,9 @@
   "scripts": {
     "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then python -m pip install -r requirements_dev.txt; fi",
     "start": "npm run start:dev",
-    "start:dev": "nodemon --watch src --watch forta.config.json -e py --exec \"python3 ./src/agent.py\"",
+    "start:dev": "nodemon --watch src --watch forta.config.json -e py --exec \"python3 src/agent.py\"",
     "start:prod": "npx forta-bot run --prod",
-    "tx": "npx forta-bot run --tx",
+    "tx": "npx forta-bot run --chainId 1 --tx",
     "block": "npx forta-bot run --block",
     "range": "npx forta-bot run --range",
     "alert": "npx forta-bot run --alert",
