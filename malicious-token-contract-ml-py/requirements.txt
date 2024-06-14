@@ -6,3 +6,4 @@ evmdasm>=0.1.10
 rlp<=3.0.0
 scikit-learn==1.2.1 # Fixed to avoid bot and model version mismatch.
 bot-alert-rate>=0.0.5
+python-dotenv-1.0.1

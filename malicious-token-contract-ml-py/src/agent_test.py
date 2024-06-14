@@ -69,7 +69,6 @@ class TestMaliciousSmartContractML:
         addresses = await agent.get_storage_addresses(w3, EOA_ADDRESS)
         assert len(addresses) == 0, "should be empty; EOA has no storage"
 
-    @pytest.mark.asyncio
     def test_calc_contract_address(self):
         contract_address = agent.calc_contract_address(w3, EOA_ADDRESS, 9)
         assert (

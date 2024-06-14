@@ -1,6 +1,7 @@
 import forta_bot_sdk
 import rlp
 import asyncio
+from os import getenv
 from forta_bot_sdk import EntityType, scan_ethereum, run_health_check
 from joblib import load
 from evmdasm import EvmBytecode
@@ -22,7 +23,9 @@ from utils import (
 )
 
 from storage import get_secrets
+from dotenv import load_dotenv
 
+load_dotenv()
 SECRETS_JSON = get_secrets()
 
 ML_MODEL = None
@@ -236,7 +239,7 @@ async def main():
 
     await asyncio.gather(
         scan_ethereum({
-            'rpc_url': 'https://cloudflare-eth.com/',
+            'rpc_url': getenv('EVM_RPC'),
             'handle_transaction': handle_transaction
         }),
         run_health_check()
