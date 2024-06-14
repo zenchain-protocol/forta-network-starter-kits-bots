@@ -52,7 +52,7 @@ class TokenContractFindings:
                 "labels": self.labels,
                 "source": {
                     "chains": [
-                        {"chain_id": 1}
+                        {"chain_id": chain_id}
                     ]  # associates this finding to Ethereum mainnet
                 },
             }
@@ -85,7 +85,7 @@ class TokenContractFindings:
                 "labels": self.labels,
                 "source": {
                     "chains": [
-                        {"chain_id": 1}
+                        {"chain_id": chain_id}
                     ]  # associates this finding to Ethereum mainnet
                 },
             }
@@ -112,7 +112,7 @@ class TokenContractFindings:
                 "labels": self.labels,
                 "source": {
                     "chains": [
-                        {"chain_id": 1}
+                        {"chain_id": chain_id}
                     ]  # associates this finding to Ethereum mainnet
                 },
             }

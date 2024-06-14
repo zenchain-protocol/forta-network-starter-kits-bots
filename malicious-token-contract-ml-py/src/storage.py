@@ -3,6 +3,10 @@ import json
 import requests
 import os
 
+
+# TODO: Replace this with a Secrets/Storage API: 
+# https://github.com/zenchain-protocol/zenchain-node/issues/300
+
 owner_db = "https://research.forta.network/database/owner/"
 
 test_mode = "main" if 'NODE_ENV' in os.environ and 'production' in os.environ.get(

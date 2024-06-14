@@ -1,6 +1,8 @@
+from os import getenv
 import asyncio
 import web3
 from hexbytes import HexBytes
+from dotenv import load_dotenv
 
 EOA_ADDRESS = "0x1c5dCdd006EA78a7E4783f9e6021C32935a10fb4"
 CONTRACT_NO_ADDRESS = "0x04c90C198b2eFF55716079bc06d7CCc4aa4d7512"
@@ -27,7 +29,7 @@ class Web3Mock:
 class EthMock:
     def __init__(self):
         self.contract = ContractMock()
-        self.chain_id = 1
+        self.chain_id = int(getenv('EVM_CHAIN_ID'))
 
     def get_transaction_count(self, address):
         if address == EOA_ADDRESS:

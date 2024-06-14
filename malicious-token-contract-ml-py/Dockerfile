@@ -1,21 +1,6 @@
-# Build stage: compile Python dependencies
-FROM ubuntu:focal as builder
-RUN apt-get update -y && apt-get upgrade -y
-# Python 3.10
-RUN apt-get install -y python3 pip
-RUN python3 -m pip install --upgrade pip
+FROM nikolaik/python-nodejs:python3.10-nodejs20 
 COPY requirements.txt ./
-RUN python3 -m pip install --user -r requirements.txt
-
-# Final stage: copy over Python dependencies and install production Node dependencies
-FROM ubuntu:focal
-# this python version should match the build stage python version
-RUN apt-get update
-RUN apt-get -y install curl gnupg
-RUN curl -sL https://deb.nodesource.com/setup_20.x  | bash -
-RUN apt-get -y install nodejs
-COPY --from=builder /root/.local /root/.local
-ENV PATH=/root/.local:$PATH
+RUN python -m pip install --user -r requirements.txt
 ENV NODE_ENV=production
 # Uncomment the following line to enable agent logging
 LABEL "network.forta.settings.agent-logs.enable"="true"

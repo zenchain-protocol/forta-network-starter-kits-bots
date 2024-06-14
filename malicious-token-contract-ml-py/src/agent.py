@@ -41,7 +41,7 @@ async def initialize():
     logger.info("Complete loading model")
 
     global CHAIN_ID
-    CHAIN_ID = 1
+    CHAIN_ID = int(getenv('EVM_CHAIN_ID'))
 
     environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
 
