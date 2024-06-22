@@ -34,7 +34,7 @@ SECRETS_JSON = {
         "FTMSCAN_TOKEN": "your-ftmscan-api-key",
         "SNOWTRACE_TOKEN": "your-snowtrace-api-key",
         "BLOCKSCOUT_TOKEN": "your-blockscout-api-key",
-        "ZETTABLOCK": "your-zettablock-api-key",
+        "ZETTABLOCK_API_KEY": "your-zettablock-api-key",
     }
 }
 

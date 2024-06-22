@@ -12,7 +12,8 @@ from constants import (
     BYTE_CODE_LENGTH_THRESHOLD,
     MODEL_THRESHOLD,
     SAFE_CONTRACT_THRESHOLD,
-    EVM_CHAIN_ID
+    EVM_CHAIN_ID,
+    EVM_RPC
 )
 from findings import TokenContractFindings
 from logger import logger
@@ -41,7 +42,7 @@ async def initialize():
     global SECRETS_JSON 
     SECRETS_JSON = get_secrets()
 
-    environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
+    environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK_API_KEY"]
 
 
 async def exec_model(w3: AsyncWeb3, opcodes: str, contract_creator: str) -> tuple:
@@ -237,8 +238,11 @@ async def main():
 
     await asyncio.gather(
         scan_ethereum({
-            'rpc_url': getenv('EVM_RPC'),
-            'handle_transaction': handle_transaction
+            'rpc_url': EVM_RPC,
+            'handle_transaction': handle_transaction,
+            'rpc_headers': {
+                "Content-Type": "application/json"
+            }
         }),
         run_health_check()
     )

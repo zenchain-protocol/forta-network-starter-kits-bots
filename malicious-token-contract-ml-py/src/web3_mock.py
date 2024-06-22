@@ -1,4 +1,3 @@
-from os import getenv
 import asyncio
 import web3
 from hexbytes import HexBytes
