@@ -18,10 +18,37 @@ from web3_mock import (
     SHORT_CONTRACT,
     Web3Mock,
 )
+from unittest.mock import patch
 
 w3 = Web3Mock()
 pytest_plugins = ("pytest_asyncio",)
 
+# Mock secrets data
+SECRETS_JSON = {
+    "apiKeys": {
+        "ETHERSCAN_TOKEN": "your-etherscan-api-key",
+        "POLYGONSCAN_TOKEN": "your-polygonscan-api-key",
+        "BSCSCAN_TOKEN": "your-bscscan-api-key",
+        "ARBISCAN_TOKEN": "your-arbiscan-api-key",
+        "OPTIMISTICSCAN_TOKEN": "your-optimisticscan-api-key",
+        "FTMSCAN_TOKEN": "your-ftmscan-api-key",
+        "SNOWTRACE_TOKEN": "your-snowtrace-api-key",
+        "BLOCKSCOUT_TOKEN": "your-blockscout-api-key",
+        "ZETTABLOCK": "your-zettablock-api-key",
+    }
+}
+
+# Fixture to mock get_secrets function globally for all tests
+@pytest.fixture(autouse=True)
+def mock_get_secrets():
+    with patch("agent.get_secrets", return_value=SECRETS_JSON):
+        yield
+
+# Fixture to patch calculate_alert_rate with a random value
+@pytest.fixture
+def mock_calculate_alert_rate():
+    with patch("findings.calculate_alert_rate", return_value=random.uniform(0.1, 1.0)):
+        yield
 
 class TestMaliciousSmartContractML:
     @pytest.mark.asyncio

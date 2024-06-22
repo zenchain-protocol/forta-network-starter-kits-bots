@@ -8,3 +8,4 @@ malicious_token_model_06_06_24_exp6.joblib
 malicious_token_model_02_07_23_exp6.joblib
 secrets.json
 venv
+.env

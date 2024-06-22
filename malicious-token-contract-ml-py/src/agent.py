@@ -1,18 +1,18 @@
 import forta_bot_sdk
 import rlp
 import asyncio
-from os import getenv
+from os import environ
 from forta_bot_sdk import EntityType, scan_ethereum, run_health_check
 from joblib import load
 from evmdasm import EvmBytecode
 from web3 import AsyncWeb3
-from os import environ
 
 
 from constants import (
     BYTE_CODE_LENGTH_THRESHOLD,
     MODEL_THRESHOLD,
     SAFE_CONTRACT_THRESHOLD,
+    EVM_CHAIN_ID
 )
 from findings import TokenContractFindings
 from logger import logger
@@ -23,13 +23,8 @@ from utils import (
 )
 
 from storage import get_secrets
-from dotenv import load_dotenv
-
-load_dotenv()
-SECRETS_JSON = get_secrets()
 
 ML_MODEL = None
-
 
 async def initialize():
     """
@@ -41,7 +36,10 @@ async def initialize():
     logger.info("Complete loading model")
 
     global CHAIN_ID
-    CHAIN_ID = int(getenv('EVM_CHAIN_ID'))
+    CHAIN_ID = EVM_CHAIN_ID
+
+    global SECRETS_JSON 
+    SECRETS_JSON = get_secrets()
 
     environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
 
