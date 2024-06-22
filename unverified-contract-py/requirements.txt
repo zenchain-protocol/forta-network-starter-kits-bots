@@ -4,3 +4,4 @@ pyevmasm>=0.2.3
 rlp>=2.0.1
 hexbytes>=0.2.2
 bot-alert-rate>=0.0.4
+python-dotenv>=1.0.1

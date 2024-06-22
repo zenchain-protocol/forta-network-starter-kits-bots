@@ -22,10 +22,6 @@ from findings import UnverifiedCodeContractFindings
 from storage import get_secrets
 from constants import CHAIN_ID, EVM_RPC
 
-SECRETS_JSON = get_secrets()
-
-blockexplorer = BlockExplorer(CHAIN_ID)
-
 FINDINGS_CACHE = []
 THREAD_STARTED = False
 CREATED_CONTRACTS = {}  # contract and creation timestamp
@@ -53,6 +49,12 @@ async def initialize():
 
     global CREATED_CONTRACTS
     CREATED_CONTRACTS = {}
+
+    global SECRETS_JSON 
+    SECRETS_JSON = get_secrets()
+
+    global BLOCK_EXPLORER
+    BLOCK_EXPLORER = BlockExplorer(CHAIN_ID)
 
     environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
 
@@ -235,7 +237,7 @@ def detect_unverified_contract_creation(
                             logging.info(
                                 f"Evaluating contract {created_contract_address} from cache. Is old enough."
                             )
-                            if not blockexplorer.is_verified(created_contract_address):
+                            if not BLOCK_EXPLORER.is_verified(created_contract_address):
                                 logging.info(
                                     f"Identified unverified contract: {created_contract_address}"
                                 )
@@ -299,7 +301,7 @@ def detect_unverified_contract_creation(
                                         logging.info(
                                             f"Evaluating contract {created_contract_address} from cache. Is old enough."
                                         )
-                                        if not blockexplorer.is_verified(
+                                        if not BLOCK_EXPLORER.is_verified(
                                             created_contract_address
                                         ):
                                             logging.info(
@@ -351,7 +353,7 @@ async def handle_transaction(
     if not THREAD_STARTED:
         THREAD_STARTED = True
         thread = threading.Thread(
-            target=detect_unverified_contract_creation, args=(provider, blockexplorer)
+            target=detect_unverified_contract_creation, args=(provider, BLOCK_EXPLORER)
         )
         thread.start()
     cache_contract_creation(provider, transaction_event)

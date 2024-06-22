@@ -46,22 +46,6 @@ To run the project locally, follow these steps:
   source venv/bin/activate
   ```
 
-- **Secrets**: Fill out the `secrets.example.json` file and rename it to `secrets.json`. This file should contain the necessary API keys for the project to function.
-
-  ```json
-  {
-      "apiKeys": {
-          "ETHERSCAN_TOKEN": "your_actual_etherscan_api_key",
-          "POLYGONSCAN_TOKEN": "your_actual_polygonscan_api_key",
-          "BSCSCAN_TOKEN": "your_actual_bscscan_api_key",
-          "ARBISCAN_TOKEN": "your_actual_arbiscan_api_key",
-          "OPTIMISTICSCAN_TOKEN": "your_actual_optimisticscan_api_key",
-          "FTMSCAN_TOKEN": "your_actual_ftmscan_api_key",
-          "SNOWTRACE_TOKEN": "your_actual_snowtrace_api_key"
-      }
-  }
-  ```
-
 ### Installation
 
 1. **Clone the repository**:
@@ -118,20 +102,20 @@ You can run the application in different modes:
   npm run file
   ```
 
-### Running with Docker
+### Running with Docker Compose
 
-Alternatively, you can run the application using Docker. Make sure you have Docker installed on your machine.
+Alternatively, you can run the application using Docker Compose. Make sure you have Docker Compose installed on your machine.
 
 1. **Build the Docker image**:
 
     ```sh
-    docker build -t unverified-contract-creation .
+    docker-compose build --build-arg INSTALL_DEV=true --build-arg NODE_ENV=development
     ```
 
 2. **Run the Docker container**:
 
     ```sh
-    docker run -d unverified-contract-creation
+    docker-compose up
     ```
 
 ### Testing

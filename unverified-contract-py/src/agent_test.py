@@ -1,6 +1,7 @@
 import time
 import pytest
 from datetime import datetime
+from unittest.mock import patch, MagicMock
 
 from forta_bot_sdk import (
     FindingSeverity,
@@ -10,19 +11,21 @@ from forta_bot_sdk import (
 )
 import asyncio
 import agent
-from blockexplorer_mock import BlockExplorerMock
 from web3_mock import CONTRACT_NO_ADDRESS, CONTRACT_WITH_ADDRESS, EOA_ADDRESS, Web3Mock
-from unittest.mock import patch
 from constants import CHAIN_ID
+from blockexplorer_mock import BlockExplorerMock
 
 w3 = Web3Mock()
 blockexplorer = BlockExplorerMock(1)
 
+@pytest.fixture(autouse=True)
+@patch("agent.get_secrets", return_value=blockexplorer.SECRETS_JSON)
+@patch("agent.BlockExplorer", return_value=blockexplorer)
+def setup(mock_get_secrets, mock_block_explorer):
+    asyncio.run(agent.initialize())
+
 
 class TestUnverifiedContractAgent:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        asyncio.run(agent.initialize())
 
     def test_get_opcode_addresses_eoa(self):
         addresses = agent.get_opcode_addresses(w3, EOA_ADDRESS)
@@ -73,18 +76,15 @@ class TestUnverifiedContractAgent:
             w3, blockexplorer, wait_time=0, infinite=False
         )
         assert len(agent.FINDINGS_CACHE) == 1, "should have 1 finding"
-        assert 'anomaly_score' in agent.FINDINGS_CACHE[0].metadata
-        # For some reason, after upgrading to SDK V2, we're getting a anomaly score that's less than 1
-        # assert (
-        #     agent.FINDINGS_CACHE[0].metadata["anomaly_score"] == 1.0
-        # ), "should have anomaly score of 1.0"
-        assert float(agent.FINDINGS_CACHE[0].metadata['anomaly_score']) > 0, "anomaly score should be greater than 0"
+        assert "anomaly_score" in agent.FINDINGS_CACHE[0].metadata
+        assert (
+            float(agent.FINDINGS_CACHE[0].metadata["anomaly_score"]) > 0
+        ), "anomaly score should be greater than 0"
         assert (
             agent.FINDINGS_CACHE[0].labels[0].entity.lower() == EOA_ADDRESS.lower()
         ), "should have EOA address as label"
         assert (
-            agent.FINDINGS_CACHE[0].labels[0].entity_type
-            == EntityType.Address
+            agent.FINDINGS_CACHE[0].labels[0].entity_type == EntityType.Address
         ), "should have label_type address"
         assert (
             agent.FINDINGS_CACHE[0].labels[0].label == "attacker"
@@ -103,8 +103,7 @@ class TestUnverifiedContractAgent:
             agent.FINDINGS_CACHE[0].labels[1].confidence == 0.3
         ), "should have 0.3 as label confidence"
         assert (
-            agent.FINDINGS_CACHE[0].labels[1].entity_type
-            == EntityType.Address
+            agent.FINDINGS_CACHE[0].labels[1].entity_type == EntityType.Address
         ), "should have label_type address"
 
     def test_detect_unverified_contract_with_unverified_contract_trace(self):

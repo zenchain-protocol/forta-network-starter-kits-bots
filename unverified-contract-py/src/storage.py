@@ -1,35 +1,64 @@
-import forta_bot_sdk
-import json
-import requests
 import os
+import requests
+import json
+import warnings
+from forta_bot_sdk import fetch_jwt
+from constants import NODE_ENV, STORAGE_API_URL
 
-# TODO: Replace this inaccessible, private Forta API/database with some other method of managing secrets in production
-# https://docs.forta.network/en/latest/sensitive-data/
-# https://docs.forta.network/en/latest/jwt-auth/
-owner_db = "https://research.forta.network/database/owner/"
+# Determine the storage API URL and test mode
+test_mode = "production" if NODE_ENV == "production" else "test"
 
-test_mode = "main" if 'NODE_ENV' in os.environ and 'production' in os.environ.get(
-    'NODE_ENV') else "test"
-
-
+# Function to fetch JWT token
 def _token():
-    tk = forta_bot_sdk.fetch_jwt({})
+    tk = fetch_jwt({})
     return {"Authorization": f"Bearer {tk}"}
 
+# Function to fetch individual key values
+def fetch_key(key: str):
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    
+    if test_mode == "production":
+        token_headers = _token()
+        headers.update(token_headers)
+    
+    url = f"{STORAGE_API_URL}/value?key={key}"
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json().get('data', None)
+    elif response.status_code == 404:
+        warnings.warn(f"Key not found: {key}")
+        return None
+    else:
+        raise ConnectionError(f"Failed to fetch key: {key}, Status: {response.status_code}, Text: {response.text}")
 
-def _load_json(key: str) -> object:
-    # if test_mode == "test":
-        # loading json from local file secrets.json
-        with open("secrets.json") as f:
-            return json.load(f)
-    # else:
-    #     res = requests.get(f"{owner_db}{key}", headers=_token())
-    #     if res.status_code == 200:
-    #         return res.json()
-    #     else:
-    #         raise Exception(
-    #             f"error loading json from owner db: {res.status_code}, {res.text}")
-
-
+# Function to fetch all secrets
 def get_secrets():
-    return _load_json("secrets.json")
+    keys = [
+        'ETHERSCAN_TOKEN',
+        'POLYGONSCAN_TOKEN',
+        'BSCSCAN_TOKEN',
+        'ARBISCAN_TOKEN',
+        'OPTIMISTICSCAN_TOKEN',
+        'FTMSCAN_TOKEN',
+        'SNOWTRACE_TOKEN',
+        'BLOCKSCOUT_TOKEN',
+        'ZETTABLOCK'
+    ]
+    
+    api_keys = {}
+    all_keys_not_found = True
+
+    for key in keys:
+        value = fetch_key(key)
+        if value is not None:
+            all_keys_not_found = False
+        api_keys[key] = value or ""
+
+    if all_keys_not_found:
+        raise ValueError("All keys returned 404. Something is wrong with the key fetching process.")
+
+    return {"apiKeys": api_keys}

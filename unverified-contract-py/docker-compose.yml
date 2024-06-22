@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   alice:
     image: krisbit/zenchain-testnet
@@ -18,8 +16,6 @@ services:
       - "--unsafe-rpc-external"
       - "--log=sub-libp2p=trace"
       - "--rpc-cors=all"
-    networks:
-      - internal_network
 
   bob:
     image: krisbit/zenchain-testnet
@@ -37,8 +33,6 @@ services:
       - "--rpc-cors=all"
       - "--unsafe-rpc-external"
       - "--log=sub-libp2p=trace"
-    networks:
-      - internal_network
 
   dave:
     image: krisbit/zenchain-testnet
@@ -55,28 +49,49 @@ services:
       - "--rpc-cors=all"
       - "--unsafe-rpc-external"
       - "--log=sub-libp2p=trace"
-    networks:
-      - internal_network
+  
+  redis:
+    image: redis:latest
+    command: redis-server --requirepass your_redis_password
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
 
+  api:
+    build: https://github.com/zenchain-protocol/forta-storage.git
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: your_redis_password
+      NODE_ENV: development # or production, depending on what you want to test
+      NODE_PORT: 8080
+      VALUE_BLOCKSCOUT_TOKEN: your-blockscout-api-key
+      VALUE_ETHERSCAN_TOKEN: your-etherscan-token
+      VALUE_ZENCHAIN_API_KEY: example_zenchain_api_key
+      VALUE_ZETTABLOCK_API_KEY: example_zettablock_api_key
+    depends_on:
+      - redis
   app:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      - NODE_ENV=production
-      - FORTA_BOT_ID=0x4c7e56a9a753e29ca92bd57dd593bdab0c03e762bdd04e2bc578cb82b842c1f3
-      - FORTA_CHAIN_ID=1
-    volumes:
-      - .:/app
+      ARBITRARY_BLOCKSCOUT_ENDPOINT: "https://eth.blockscout.com" #https://arbitrary.blockscount.com
+      EVM_RPC: http://alice:9944" #https://cloudflare-eth.com
+      NODE_ENV: development
+      FORTA_BOT_ID: 1 #0x4c7e56a9a753e29ca92bd57dd593bdab0c03e762bdd04e2bc578cb82b842c1f3
+      FORTA_CHAIN_ID: 8408 #1
+      STORAGE_API_URL: http://api:8080
     ports:
       - "3000:3000"
     depends_on:
       - alice
       - bob
       - dave
-      - mitmproxy
-    networks:
-      - internal_network
+      - api
 
-networks:
-  internal_network:
+volumes:
+  redis_data:
