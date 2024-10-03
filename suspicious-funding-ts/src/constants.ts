@@ -7,14 +7,15 @@ export const BOTS_TO_MONITOR = [
 
 export const DAYS_TO_LOOK_BACK = 3;
 
+// Around $11500 at the time of the update
 export const VALUE_THRESHOLDS: Record<number, number> = {
-  1: 0.07,
-  10: 0.07,
-  56: 0.5,
-  137: 190,
-  250: 400,
-  42161: 0.07,
-  43114: 4,
+  1: 5,
+  10: 5,
+  56: 22,
+  137: 30000,
+  250: 24000,
+  42161: 5,
+  43114: 485,
 };
 
 export const alertOriginMap = {
@@ -22,3 +23,16 @@ export const alertOriginMap = {
   "FIXED-FLOAT": "Fixed Float",
   "ATTACK-DETECTOR": "Attack Detector",
 };
+
+const ONE_DAY = 60 * 60 * 24;
+const THREE_SECOND_BLOCK_TIME = 3;
+const ETH_BLOCK_TIME = 12;
+export const ETH_BLOCKS_IN_ONE_DAY = ONE_DAY / ETH_BLOCK_TIME;
+// Amount of blocks in a day for faster chains
+// Using 3 second block times as the average
+export const THREE_SECOND_BLOCKS_IN_ONE_DAY = ONE_DAY / THREE_SECOND_BLOCK_TIME;
+
+export const TRUE_POSITIVE_LIST_PATH = "../tp_list.csv";
+// Using the Early Attack Detector True Positive list as source of truth
+export const TRUE_POSITIVE_LIST_URL =
+  "https://raw.githubusercontent.com/forta-network/starter-kits/main/early-attack-detector-py/tp_list.csv";
