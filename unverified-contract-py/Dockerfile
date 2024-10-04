@@ -7,7 +7,7 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONPATH="/usr/local/lib/python3.10/site-packages"
-ARG NODE_ENV=development
+ARG NODE_ENV=production
 # Argument to control whether to install dev dependencies
 ARG INSTALL_DEV=false
 ENV NODE_ENV=${NODE_ENV}

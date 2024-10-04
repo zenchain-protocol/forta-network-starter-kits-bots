@@ -67,11 +67,10 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      ARBITRARY_BLOCKSCOUT_ENDPOINT: https://zentrace.io #https://arbitrary.blockscount.com
-      EVM_RPC: http://alice:9944 #https://cloudflare-eth.com
+      ARBITRARY_BLOCKSCOUT_ENDPOINT: https://zentrace.io
+      EVM_RPC: http://alice:9944
       NODE_ENV: development
-      FORTA_BOT_ID: 1 #0x4c7e56a9a753e29ca92bd57dd593bdab0c03e762bdd04e2bc578cb82b842c1f3
-      FORTA_CHAIN_ID: 8408 #1
+      CHAIN_ID: 8408
       STORAGE_API_URL: http://api:8080
     ports:
       - "3000:3000"

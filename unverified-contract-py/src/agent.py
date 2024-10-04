@@ -16,11 +16,15 @@ import time
 import asyncio
 import traceback
 
+from forta_bot_sdk import fetch_jwt, decode_jwt
+
 from blockexplorer import BlockExplorer
 from constants import CONTRACT_SLOT_ANALYSIS_DEPTH, WAIT_TIME, CONCURRENT_SIZE
 from findings import UnverifiedCodeContractFindings
 from storage import get_secrets
 from constants import CHAIN_ID, EVM_RPC
+
+
 
 FINDINGS_CACHE = []
 THREAD_STARTED = False
@@ -50,11 +54,16 @@ async def initialize():
     global CREATED_CONTRACTS
     CREATED_CONTRACTS = {}
 
+    global BOT_ID
+    jwt = await fetch_jwt({})
+    decoded_token_data = decode_jwt(jwt)
+    BOT_ID = decoded_token_data["payload"]["bot-id"]
+
     global SECRETS_JSON 
-    SECRETS_JSON = get_secrets()
+    SECRETS_JSON = await get_secrets()
 
     global BLOCK_EXPLORER
-    BLOCK_EXPLORER = BlockExplorer(CHAIN_ID)
+    BLOCK_EXPLORER = BlockExplorer(CHAIN_ID, SECRETS_JSON)
 
     environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
 
@@ -260,6 +269,7 @@ def detect_unverified_contract_creation(
                                         created_contract_address,
                                         CHAIN_ID,
                                         set.union(storage_addresses, opcode_addresses),
+                                        BOT_ID,
                                     )
                                 )
 
@@ -328,6 +338,7 @@ def detect_unverified_contract_creation(
                                                         storage_addresses,
                                                         opcode_addresses,
                                                     ),
+                                                    BOT_ID,
                                                 )
                                             )
                                             CREATED_CONTRACTS.pop(
