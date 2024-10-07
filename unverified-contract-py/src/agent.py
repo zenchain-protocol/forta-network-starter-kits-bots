@@ -8,7 +8,7 @@ from functools import lru_cache
 
 import forta_bot_sdk
 import rlp
-from forta_bot_sdk import scan_ethereum, scan_alerts, run_health_check
+from forta_bot_sdk import scan_ethereum, scan_alerts, run_health_check, fetch_jwt, decode_jwt
 from hexbytes import HexBytes
 from pyevmasm import disassemble_hex
 from web3 import Web3, AsyncWeb3
@@ -16,15 +16,11 @@ import time
 import asyncio
 import traceback
 
-from forta_bot_sdk import fetch_jwt, decode_jwt
-
 from blockexplorer import BlockExplorer
 from constants import CONTRACT_SLOT_ANALYSIS_DEPTH, WAIT_TIME, CONCURRENT_SIZE
 from findings import UnverifiedCodeContractFindings
 from storage import get_secrets
 from constants import CHAIN_ID, EVM_RPC
-
-
 
 FINDINGS_CACHE = []
 THREAD_STARTED = False
@@ -58,6 +54,7 @@ async def initialize():
     jwt = await fetch_jwt({})
     decoded_token_data = decode_jwt(jwt)
     BOT_ID = decoded_token_data["payload"]["bot-id"]
+    environ['FORTA_BOT_ID'] = environ.get('FORTA_BOT_ID', BOT_ID)
 
     global SECRETS_JSON 
     SECRETS_JSON = await get_secrets()
@@ -170,7 +167,6 @@ def cache_contract_creation(
     w3, transaction_event: forta_bot_sdk.TransactionEvent
 ):
     global CREATED_CONTRACTS
-
 
     logging.info(
         f"Scanning transaction {transaction_event.transaction.hash} on chain {CHAIN_ID}"
@@ -379,9 +375,7 @@ async def handle_transaction(
 async def main():
     """This function is the entry point
     """
-    initialize_response = await initialize()
-
-    # TODO: Fix AssertionError: botId must be non-empty string
+    await initialize()
     await asyncio.gather(
         scan_ethereum({
             'rpc_url': EVM_RPC,
@@ -392,7 +386,6 @@ async def main():
         }),
         run_health_check()
     )
-
 
 # only invoke main() if running this file directly (vs importing it for testing)
 if __name__ == "__main__":
