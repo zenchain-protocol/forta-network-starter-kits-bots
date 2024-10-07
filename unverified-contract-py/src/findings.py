@@ -2,12 +2,10 @@ from forta_bot_sdk import Finding, FindingSeverity, FindingType, EntityType
 from bot_alert_rate import calculate_alert_rate, ScanCountType
 import hashlib
 
-from constants import BOT_ID
-
 class UnverifiedCodeContractFindings:
 
     @staticmethod
-    def unverified_code(from_address: str, contract_address: str, chain_id: int, contained_addresses: set) -> Finding:
+    def unverified_code(from_address: str, contract_address: str, chain_id: int, contained_addresses: set, bot_id: str) -> Finding:
 
         labels = [{"entity": from_address,
                    "entity_type": EntityType.Address,
@@ -25,7 +23,7 @@ class UnverifiedCodeContractFindings:
         if chain_id not in [43114, 10, 250]:
             metadata['anomaly_score'] = calculate_alert_rate(
                 chain_id,
-                BOT_ID,
+                bot_id,
                 'UNVERIFIED-CODE-CONTRACT-CREATION',
                 ScanCountType.CONTRACT_CREATION_COUNT)
 

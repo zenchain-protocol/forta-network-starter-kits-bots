@@ -1,5 +1,17 @@
 FROM python:3.10-slim-bookworm
 
+# Define build-time arguments
+ARG CHAIN_ID
+ARG EVM_RPC
+ARG STORAGE_API_URL
+ARG NODE_ENV
+
+# Set environment variables in the container
+ENV CHAIN_ID=$CHAIN_ID
+ENV EVM_RPC=$EVM_RPC
+ENV STORAGE_API_URL=$STORAGE_API_URL
+ENV NODE_ENV=$NODE_ENV
+
 # Install dependencies and Node Version Manager (nvm)
 RUN apt-get update && \
     apt-get install -y bash curl build-essential coreutils && \
@@ -7,10 +19,8 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONPATH="/usr/local/lib/python3.10/site-packages"
-ARG NODE_ENV=development
 # Argument to control whether to install dev dependencies
 ARG INSTALL_DEV=false
-ENV NODE_ENV=${NODE_ENV}
 ENV NVM_DIR="/root/.nvm"
 
 # Install Python dependencies

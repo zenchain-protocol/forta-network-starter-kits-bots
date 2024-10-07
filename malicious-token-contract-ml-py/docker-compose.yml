@@ -1,6 +1,7 @@
 services:
   alice:
-    image: krisbit/zenchain-testnet #your-image-rpo/your-evm-node-image
+    platform: linux/x86_64
+    image: ghcr.io/zenchain-protocol/zenchain-testnet:latest
     ports:
       - "9944:9944"
       - "9615:9615"
@@ -18,7 +19,8 @@ services:
       - "--rpc-cors=all"
 
   bob:
-    image: krisbit/zenchain-testnet #your-image-rpo/your-evm-node-image
+    platform: linux/x86_64
+    image: ghcr.io/zenchain-protocol/zenchain-testnet:latest
     ports:
       - "9945:9944"
     command:
@@ -34,23 +36,8 @@ services:
       - "--unsafe-rpc-external"
       - "--log=sub-libp2p=trace"
 
-  dave:
-    image: krisbit/zenchain-testnet #your-image-rpo/your-evm-node-image
-    ports:
-      - "9946:9944"
-    command:
-      - "./usr/bin/zenchain-node" #./user/bin/your-evm-node-binary
-      - "--node-key=0000000000000000000000000000000000000000000000000000000000000003"
-      - "--base-path=/tmp/light"
-      - "--chain=local"
-      - "--port=30333"
-      - "--bootnodes=/dns/alice/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp"
-      - "--bootnodes=/dns/bob/tcp/30333/p2p/12D3KooWHdiAxVd8uMQR1hGWXccidmfCwLqcMpGwR6QcTP6QRMuD"
-      - "--rpc-cors=all"
-      - "--unsafe-rpc-external"
-      - "--log=sub-libp2p=trace"
-
   redis:
+    platform: linux/x86_64
     image: redis:latest
     command: redis-server --requirepass your_redis_password
     ports:
@@ -59,6 +46,7 @@ services:
       - redis_data:/data
 
   api:
+    platform: linux/x86_64
     build: https://github.com/zenchain-protocol/forta-storage.git
     ports:
       - "8080:8080"
@@ -73,6 +61,7 @@ services:
       - redis
 
   app:
+    platform: linux/x86_64
     build:
       context: .
       dockerfile: Dockerfile
@@ -89,7 +78,6 @@ services:
     depends_on:
       - alice
       - bob
-      - dave
       - api
 
 volumes:

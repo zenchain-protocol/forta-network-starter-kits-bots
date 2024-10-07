@@ -6,15 +6,16 @@ class BlockExplorerMock:
 
     SECRETS_JSON = {
         "apiKeys": {
-            "ETHERSCAN_TOKEN": "your-etherscan-api-key",
-            "POLYGONSCAN_TOKEN": "your-polygonscan-api-key",
-            "BSCSCAN_TOKEN": "your-bscscan-api-key",
-            "ARBISCAN_TOKEN": "your-arbiscan-api-key",
-            "OPTIMISTICSCAN_TOKEN": "your-optimisticscan-api-key",
-            "FTMSCAN_TOKEN": "your-ftmscan-api-key",
-            "SNOWTRACE_TOKEN": "your-snowtrace-api-key",
-            "BLOCKSCOUT_TOKEN": "your-blockscout-api-key",
-            "ZETTABLOCK": "your-zettablock-api-key",
+            "ETHERSCAN_API_KEY": "your-etherscan-api-key",
+            "POLYGONSCAN_API_KEY": "your-polygonscan-api-key",
+            "BSCSCAN_API_KEY": "your-bscscan-api-key",
+            "ARBISCAN_API_KEY": "your-arbiscan-api-key",
+            "OPTIMISTICSCAN_API_KEY": "your-optimisticscan-api-key",
+            "FTMSCAN_API_KEY": "your-ftmscan-api-key",
+            "SNOWTRACE_API_KEY": "your-snowtrace-api-key",
+            "BLOCKSCOUT_API_KEY": "your-blockscout-api-key",
+            "ZETTABLOCK_API_KEY": "your-zettablock-api-key",
+            "ZENTRACE_API_KEY": "your-zentrace-api-key",
         }
     }
 

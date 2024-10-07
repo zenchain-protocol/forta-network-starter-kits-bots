@@ -12,7 +12,7 @@ BYTE_CODE_LENGTH_THRESHOLD = (
 )
 MASK = "0xffffffffffffffffffffffffffffffffffffffff"
 
-EVM_CHAIN_ID = int(environ['FORTA_CHAIN_ID'])
+CHAIN_ID = int(environ['CHAIN_ID'])
 EVM_RPC = environ['EVM_RPC']
 NODE_ENV = environ['NODE_ENV']
 STORAGE_API_URL = environ['STORAGE_API_URL']

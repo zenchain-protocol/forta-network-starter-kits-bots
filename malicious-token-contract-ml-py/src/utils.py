@@ -2,12 +2,8 @@ from hexbytes import HexBytes
 import requests
 from web3 import AsyncWeb3
 
-
 from constants import CONTRACT_SLOT_ANALYSIS_DEPTH, MASK
 from logger import logger
-
-BOT_ID = "0x887678a85e645ad060b2f096812f7c71e3d20ed6ecf5f3acde6e71baa4cf86ad"
-
 
 async def is_contract(w3: AsyncWeb3, address) -> bool:
     """

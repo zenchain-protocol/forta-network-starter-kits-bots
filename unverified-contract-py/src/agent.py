@@ -8,7 +8,7 @@ from functools import lru_cache
 
 import forta_bot_sdk
 import rlp
-from forta_bot_sdk import scan_ethereum, scan_alerts, run_health_check
+from forta_bot_sdk import scan_ethereum, scan_alerts, run_health_check, fetch_jwt, decode_jwt
 from hexbytes import HexBytes
 from pyevmasm import disassemble_hex
 from web3 import Web3, AsyncWeb3
@@ -50,13 +50,19 @@ async def initialize():
     global CREATED_CONTRACTS
     CREATED_CONTRACTS = {}
 
+    global BOT_ID
+    jwt = await fetch_jwt({})
+    decoded_token_data = decode_jwt(jwt)
+    BOT_ID = decoded_token_data["payload"]["bot-id"]
+    environ['FORTA_BOT_ID'] = environ.get('FORTA_BOT_ID', BOT_ID)
+
     global SECRETS_JSON 
-    SECRETS_JSON = get_secrets()
+    SECRETS_JSON = await get_secrets()
 
     global BLOCK_EXPLORER
-    BLOCK_EXPLORER = BlockExplorer(CHAIN_ID)
+    BLOCK_EXPLORER = BlockExplorer(CHAIN_ID, SECRETS_JSON)
 
-    environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
+    environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK_API_KEY"]
 
 
 def calc_contract_address(w3, address, nonce) -> str:
@@ -162,7 +168,6 @@ def cache_contract_creation(
 ):
     global CREATED_CONTRACTS
 
-
     logging.info(
         f"Scanning transaction {transaction_event.transaction.hash} on chain {CHAIN_ID}"
     )
@@ -260,6 +265,7 @@ def detect_unverified_contract_creation(
                                         created_contract_address,
                                         CHAIN_ID,
                                         set.union(storage_addresses, opcode_addresses),
+                                        BOT_ID,
                                     )
                                 )
 
@@ -328,6 +334,7 @@ def detect_unverified_contract_creation(
                                                         storage_addresses,
                                                         opcode_addresses,
                                                     ),
+                                                    BOT_ID,
                                                 )
                                             )
                                             CREATED_CONTRACTS.pop(
@@ -368,9 +375,7 @@ async def handle_transaction(
 async def main():
     """This function is the entry point
     """
-    initialize_response = await initialize()
-
-    # TODO: Fix AssertionError: botId must be non-empty string
+    await initialize()
     await asyncio.gather(
         scan_ethereum({
             'rpc_url': EVM_RPC,
@@ -381,7 +386,6 @@ async def main():
         }),
         run_health_check()
     )
-
 
 # only invoke main() if running this file directly (vs importing it for testing)
 if __name__ == "__main__":

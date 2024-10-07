@@ -8,12 +8,10 @@ from constants import NODE_ENV, STORAGE_API_URL
 # Determine the storage API URL and test mode
 test_mode = "production" if NODE_ENV == "production" else "test"
 
-
 # Function to fetch JWT token
 def _token():
     tk = fetch_jwt({})
     return {"Authorization": f"Bearer {tk}"}
-
 
 # Function to fetch individual key values
 def fetch_key(key: str):
@@ -35,7 +33,6 @@ def fetch_key(key: str):
         raise ConnectionError(
             f"Failed to fetch key: {key}, Status: {response.status_code}, Text: {response.text}"
         )
-
 
 # Function to fetch all secrets
 def get_secrets():
