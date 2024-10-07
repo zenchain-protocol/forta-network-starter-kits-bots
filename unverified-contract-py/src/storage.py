@@ -38,15 +38,14 @@ async def fetch_key(key: str):
 # Function to fetch all secrets
 async def get_secrets():
     keys = [
-        'ETHERSCAN_TOKEN',
-        'POLYGONSCAN_TOKEN',
-        'BSCSCAN_TOKEN',
-        'ARBISCAN_TOKEN',
-        'OPTIMISTICSCAN_TOKEN',
-        'FTMSCAN_TOKEN',
-        'SNOWTRACE_TOKEN',
-        'BLOCKSCOUT_TOKEN',
-        'ZETTABLOCK',
+        'ETHERSCAN_API_KEY',
+        'POLYGONSCAN_API_KEY',
+        'BSCSCAN_API_KEY',
+        'ARBISCAN_API_KEY',
+        'OPTIMISTICSCAN_API_KEY',
+        'FANTOMSCAN_API_KEY',
+        'SNOWTRACE_API_KEY',
+        'ZETTABLOCK_API_KEY',
         'ZENTRACE_API_KEY'
     ]
     

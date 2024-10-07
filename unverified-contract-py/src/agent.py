@@ -62,7 +62,7 @@ async def initialize():
     global BLOCK_EXPLORER
     BLOCK_EXPLORER = BlockExplorer(CHAIN_ID, SECRETS_JSON)
 
-    environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK"]
+    environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK_API_KEY"]
 
 
 def calc_contract_address(w3, address, nonce) -> str:
