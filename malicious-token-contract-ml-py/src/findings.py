@@ -1,9 +1,6 @@
 from forta_bot_sdk import Finding, FindingType, FindingSeverity
 from bot_alert_rate import calculate_alert_rate, ScanCountType
 
-BOT_ID = "0x887678a85e645ad060b2f096812f7c71e3d20ed6ecf5f3acde6e71baa4cf86ad"
-
-
 class TokenContractFindings:
     def __init__(
         self,
@@ -12,6 +9,7 @@ class TokenContractFindings:
         contained_addresses: set,
         model_score: float,
         model_threshold: float,
+        bot_id: str,
     ):
         self.metadata = {
             "address_contained_in_created_contract_" + str(i): str(address)
@@ -21,6 +19,7 @@ class TokenContractFindings:
         self.metadata["model_threshold"] = str(model_threshold)
         self.description = f"{from_address} created contract {contract_address}"
         self.labels = []
+        self.bot_id = bot_id
 
     def malicious_contract_creation(
         self,
@@ -35,7 +34,7 @@ class TokenContractFindings:
 
         self.metadata["anomaly_score"] = str(calculate_alert_rate(
             chain_id,
-            BOT_ID,
+            self.bot_id,
             "SUSPICIOUS-TOKEN-CONTRACT-CREATION",
             scan_count_type,
             custom_scan_count,
@@ -69,7 +68,7 @@ class TokenContractFindings:
             self.metadata["anomaly_score"] = str(
                 calculate_alert_rate(
                     chain_id,
-                    BOT_ID,
+                    self.bot_id,
                     "SAFE-TOKEN-CONTRACT-CREATION",
                     ScanCountType.CONTRACT_CREATION_COUNT,
                 ),
@@ -96,7 +95,7 @@ class TokenContractFindings:
             self.metadata["anomaly_score"] = str(
                 calculate_alert_rate(
                     chain_id,
-                    BOT_ID,
+                    self.bot_id,
                     "NON-MALICIOUS-TOKEN-CONTRACT-CREATION",
                     ScanCountType.CONTRACT_CREATION_COUNT,
                 ),

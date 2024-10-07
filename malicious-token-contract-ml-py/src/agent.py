@@ -2,17 +2,16 @@ import forta_bot_sdk
 import rlp
 import asyncio
 from os import environ
-from forta_bot_sdk import EntityType, scan_ethereum, run_health_check
+from forta_bot_sdk import EntityType, scan_ethereum, run_health_check, fetch_jwt, decode_jwt
 from joblib import load
 from evmdasm import EvmBytecode
 from web3 import AsyncWeb3
-
 
 from constants import (
     BYTE_CODE_LENGTH_THRESHOLD,
     MODEL_THRESHOLD,
     SAFE_CONTRACT_THRESHOLD,
-    EVM_CHAIN_ID,
+    CHAIN_ID,
     EVM_RPC
 )
 from findings import TokenContractFindings
@@ -28,6 +27,12 @@ from storage import get_secrets
 ML_MODEL = None
 
 async def initialize():
+    global BOT_ID
+    jwt = await fetch_jwt({})
+    decoded_token_data = decode_jwt(jwt)
+    BOT_ID = decoded_token_data["payload"]["bot-id"]
+    environ['FORTA_BOT_ID'] = environ.get('FORTA_BOT_ID', BOT_ID)
+
     """
     this function loads the ml model.
     """
@@ -35,9 +40,6 @@ async def initialize():
     logger.info("Start loading model")
     ML_MODEL = load("malicious_token_model_02_07_23_exp6.joblib")
     logger.info("Complete loading model")
-
-    global CHAIN_ID
-    CHAIN_ID = EVM_CHAIN_ID
 
     global SECRETS_JSON 
     SECRETS_JSON = get_secrets()
@@ -145,6 +147,7 @@ async def detect_malicious_token_contract(w3: AsyncWeb3, from_, created_contract
                 set.union(storage_addresses, opcode_addresses),
                 model_score,
                 MODEL_THRESHOLD,
+                BOT_ID,
             )
             if model_score is not None:
                 from_label_type = "contract" if await is_contract(w3, from_) else "eoa"

@@ -1,10 +1,21 @@
-FROM nikolaik/python-nodejs:python3.10-nodejs20 
+FROM nikolaik/python-nodejs:python3.10-nodejs20
+
+# Define build-time arguments
+ARG CHAIN_ID
+ARG EVM_RPC
+ARG STORAGE_API_URL
+ARG NODE_ENV
+
+# Set environment variables in the container
+ENV CHAIN_ID=$CHAIN_ID
+ENV EVM_RPC=$EVM_RPC
+ENV STORAGE_API_URL=$STORAGE_API_URL
+ENV NODE_ENV=$NODE_ENV
+
 COPY requirements.txt ./
 RUN python -m pip install --user -r requirements.txt
-ARG NODE_ENV=development
 # Argument to control whether to install dev dependencies
 ARG INSTALL_DEV=false
-ENV NODE_ENV=${NODE_ENV}
 # Uncomment the following line to enable agent logging
 LABEL "network.forta.settings.agent-logs.enable"="true"
 WORKDIR /app
