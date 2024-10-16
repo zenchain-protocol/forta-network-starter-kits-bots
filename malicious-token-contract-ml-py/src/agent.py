@@ -42,7 +42,7 @@ async def initialize():
     logger.info("Complete loading model")
 
     global SECRETS_JSON 
-    SECRETS_JSON = get_secrets()
+    SECRETS_JSON = await get_secrets()
 
     environ["ZETTABLOCK_API_KEY"] = SECRETS_JSON["apiKeys"]["ZETTABLOCK_API_KEY"]
 

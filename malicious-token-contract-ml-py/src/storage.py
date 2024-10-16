@@ -9,16 +9,16 @@ from constants import NODE_ENV, STORAGE_API_URL
 test_mode = "production" if NODE_ENV == "production" else "test"
 
 # Function to fetch JWT token
-def _token():
-    tk = fetch_jwt({})
+async def _token():
+    tk = await fetch_jwt({})
     return {"Authorization": f"Bearer {tk}"}
 
 # Function to fetch individual key values
-def fetch_key(key: str):
+async def fetch_key(key: str):
     headers = {"Content-Type": "application/json", "Accept": "application/json"}
 
     if test_mode == "production":
-        token_headers = _token()
+        token_headers = await _token()
         headers.update(token_headers)
 
     url = f"{STORAGE_API_URL}/value?key={key}"
@@ -35,14 +35,14 @@ def fetch_key(key: str):
         )
 
 # Function to fetch all secrets
-def get_secrets():
+async def get_secrets():
     keys = ["ZETTABLOCK_API_KEY"]
 
     api_keys = {}
     all_keys_not_found = True
 
     for key in keys:
-        value = fetch_key(key)
+        value = await fetch_key(key)
         if value is not None:
             all_keys_not_found = False
         api_keys[key] = value or ""

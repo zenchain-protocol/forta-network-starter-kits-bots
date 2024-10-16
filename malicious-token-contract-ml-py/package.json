@@ -4,29 +4,9 @@
   "repository": "https://github.com/forta-network/starter-kits/tree/main/malicious-token-contract-ml-py",
   "description": "Malicious Token Contract Detection Bot",
   "chainIds": [
-    1,
-    56,
-    137,
-    43114,
-    42161,
-    10,
-    250,
-    8108,
     8408
   ],
   "chainSettings": {
-    "1": {
-      "shards": 3,
-      "target": 2
-    },
-    "56": {
-      "shards": 5,
-      "target": 2
-    },
-    "137": {
-      "shards": 5,
-      "target": 2
-    },
     "default": {
       "shards": 2,
       "target": 2
@@ -37,7 +17,7 @@
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e py --exec \"python3 src/agent.py\"",
     "start:prod": "python3 src/agent.py",
-    "tx": "npx forta-bot run --chainId 1 --tx",
+    "tx": "npx forta-bot run --chainId 8408 --tx",
     "block": "npx forta-bot run --block",
     "range": "npx forta-bot run --range",
     "alert": "npx forta-bot run --alert",
