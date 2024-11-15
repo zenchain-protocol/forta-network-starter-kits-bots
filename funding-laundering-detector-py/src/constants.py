@@ -1,1 +1,0 @@
-WITHDRAW_ETH_FUNCTION_ABI = '{"inputs":[{"internalType":"address","name":"destination","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawETH","outputs":[],"stateMutability":"nonpayable","type":"function"}'
