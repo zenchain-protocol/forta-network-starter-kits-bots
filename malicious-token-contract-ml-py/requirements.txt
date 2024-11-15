@@ -4,7 +4,7 @@ web3>=6.13.0
 hexbytes>=0.1.0
 evmdasm>=0.1.10
 rlp<=3.0.0
-scikit-learn==1.2.1 # Fixed to avoid bot and model version mismatch.
+scikit-learn==1.5.0 # Fixed to avoid bot and model version mismatch.
 numpy==1.23.0
 bot-alert-rate>=0.0.5
 python-dotenv>=1.0.1
